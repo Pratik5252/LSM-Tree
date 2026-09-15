@@ -1,7 +1,6 @@
 package db
 
 import (
-	"fmt"
 	"lsm-tree/memtable"
 	"lsm-tree/wal"
 )
@@ -21,7 +20,6 @@ func (db *DB) Put(key string, value []byte){
 	db.memtable.Put(key,value)
 
 	if db.memtable.Count() > 5 {
-		fmt.Print("Memtable Full")
 		Flush(db.memtable)
 	}
 }
