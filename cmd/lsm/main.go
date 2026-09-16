@@ -16,5 +16,11 @@ func main() {
 	db.Put("light",[]byte("red"))
 	db.Put("pen",[]byte("red"))
 	db.Put("reel",[]byte("red"))
+	db.Put("lamp",[]byte("red"))
+	db.Put("bird",[]byte("red"))
+	db.Put("fly",[]byte("red"))
+	db.Put("aninal",[]byte("red"))
+	db.Put("person",[]byte("red"))
+	db.Put("blood",[]byte("red"))
 
 }

@@ -4,14 +4,17 @@ import (
 	"fmt"
 	"lsm-tree/memtable"
 	"os"
+	"path/filepath"
 	"sort"
 )
 
 
-func Flush(mem *memtable.MemTable) error {
+func Flush(mem *memtable.MemTable, sstable_incr int, path string) error {
 	keys := []string{}
 
-	file,err := os.OpenFile("./data/seg.txt",os.O_CREATE | os.O_WRONLY | os.O_TRUNC,0644)
+	filename := fmt.Sprintf("seg-%d.txt",sstable_incr)
+	filePath := filepath.Join(path,filename)
+	file,err := os.OpenFile(filePath,os.O_CREATE | os.O_WRONLY | os.O_TRUNC,0644)
 
 	if err != nil {
 		return err

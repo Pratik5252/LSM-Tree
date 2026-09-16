@@ -40,3 +40,7 @@ func (m *MemTable) Count() int {
 func (m *MemTable) Entries() map[string][]byte {
 	return m.data
 }
+
+func (m *MemTable) Clear() {
+	clear(m.data)
+}

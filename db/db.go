@@ -8,6 +8,7 @@ import (
 type DB struct {
 	memtable *memtable.MemTable
 	wal *wal.WAL
+	nextSSTableID int
 }
 
 // Put adds key-value pair to the database
@@ -20,8 +21,16 @@ func (db *DB) Put(key string, value []byte){
 	db.memtable.Put(key,value)
 
 	if db.memtable.Count() > 5 {
-		Flush(db.memtable)
+		err := Flush(db.memtable,db.nextSSTableID,"./data")
+
+		if err != nil {
+			panic(err)
+		}
+
+		db.memtable.Clear()
+		db.nextSSTableID++
 	}
+
 }
 
 // Get retrieves value by key and returns value in []byte and a bool as status

@@ -33,5 +33,6 @@ func Open(path string) (*DB, error) {
 	return &DB{
 		memtable: memtable,
 		wal: wal,
+		nextSSTableID: 1,
 	}, nil
 }
