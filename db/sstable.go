@@ -1,11 +1,13 @@
 package db
 
 import (
+	"bufio"
 	"fmt"
 	"lsm-tree/memtable"
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 )
 
 
@@ -42,4 +44,37 @@ func Flush(mem *memtable.MemTable, sstable_incr int, path string) error {
 	fmt.Println(keys)
 
 	return nil
+}
+
+// Read data from segment files
+func Read(path string,key string) ([]byte,bool,error){
+
+	file,err := os.Open(path)
+
+	if err != nil {
+		return nil,false,err
+	}
+
+	defer file.Close()
+	
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan(){
+		line := scanner.Bytes()
+
+		parts := strings.Split(string(line),"|")
+
+		if len(parts) != 2 {
+			continue
+		}
+		if parts[0] == key{
+			fmt.Printf("Value %s",parts[1])
+			return []byte(parts[1]), true,nil
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil,false,err
+	}
+	return nil,false,nil
 }

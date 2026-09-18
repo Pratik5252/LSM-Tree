@@ -23,4 +23,6 @@ func main() {
 	db.Put("person",[]byte("red"))
 	db.Put("blood",[]byte("red"))
 
+
+	db.Get("apple")
 }

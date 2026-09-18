@@ -35,7 +35,19 @@ func (db *DB) Put(key string, value []byte){
 
 // Get retrieves value by key and returns value in []byte and a bool as status
 func (db *DB) Get(key string)([]byte,bool){
-	return db.memtable.Get(key)
+	value,ok := db.memtable.Get(key)
+
+	if ok {
+		return value,ok
+	}
+
+	value,ok,_ = Read("seg-1.txt",key)
+
+	if ok {
+		return value,ok
+	}
+
+	return nil,false
 }
 
 // Delete removes a key-value pair from the database
