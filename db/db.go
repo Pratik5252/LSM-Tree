@@ -1,6 +1,7 @@
 package db
 
 import (
+	"fmt"
 	"lsm-tree/memtable"
 	"lsm-tree/wal"
 )
@@ -34,20 +35,25 @@ func (db *DB) Put(key string, value []byte){
 }
 
 // Get retrieves value by key and returns value in []byte and a bool as status
-func (db *DB) Get(key string)([]byte,bool){
+func (db *DB) Get(key string)([]byte,bool,error){
 	value,ok := db.memtable.Get(key)
 
+	sstableID := db.nextSSTableID - 1
 	if ok {
-		return value,ok
+		return value,true, nil
 	}
+	for sstableID > 0 {
+		value,ok,err := Read(fmt.Sprintf("./data/seg-%d.txt",sstableID),key)
 
-	value,ok,_ = Read("seg-1.txt",key)
-
-	if ok {
-		return value,ok
+		if err != nil {
+			return nil, false, err
+		}
+		if ok {
+			return value,true, nil
+		}
+		sstableID--
 	}
-
-	return nil,false
+	return nil,false,nil
 }
 
 // Delete removes a key-value pair from the database

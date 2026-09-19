@@ -24,7 +24,6 @@ func Flush(mem *memtable.MemTable, sstable_incr int, path string) error {
 	
 	defer file.Close()
 
-	fmt.Println(file)
 	for key := range mem.Entries(){
 		keys = append(keys, key)
 	}
@@ -40,8 +39,6 @@ func Flush(mem *memtable.MemTable, sstable_incr int, path string) error {
 			return err
 		}
 	}
-
-	fmt.Println(keys)
 
 	return nil
 }

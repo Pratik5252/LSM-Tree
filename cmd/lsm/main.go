@@ -2,6 +2,7 @@ package main
 
 import (
 	"lsm-tree/db"
+	"fmt"
 )
 
 func main() {
@@ -24,5 +25,15 @@ func main() {
 	db.Put("blood",[]byte("red"))
 
 
-	db.Get("apple")
+	value, ok, err := db.Get("apple")
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	if ok {
+    fmt.Println(string(value))
+	} else {
+    fmt.Println("not found")
+	}
 }
