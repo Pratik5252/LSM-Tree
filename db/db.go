@@ -35,25 +35,31 @@ func (db *DB) Put(key string, value []byte){
 }
 
 // Get retrieves value by key and returns value in []byte and a bool as status
-func (db *DB) Get(key string)([]byte,bool,error){
-	value,ok := db.memtable.Get(key)
+func (db *DB) Get(key string)(memtable.Entry,bool,error){
+	entry,ok := db.memtable.Get(key)
 
-	sstableID := db.nextSSTableID - 1
 	if ok {
-		return value,true, nil
+		return entry,true, nil
 	}
+
+	// If not found in memtable, search in SSTables
+	sstableID := db.nextSSTableID - 1
 	for sstableID > 0 {
-		value,ok,err := Read(fmt.Sprintf("./data/seg-%d.txt",sstableID),key)
+		entry,ok,err := Read(fmt.Sprintf("./data/seg-%d.txt",sstableID),key)
 
 		if err != nil {
-			return nil, false, err
+			return memtable.Entry{}, false, err
+		}
+
+		if entry.Tombstone {
+			
 		}
 		if ok {
-			return value,true, nil
+			return entry,true, nil
 		}
 		sstableID--
 	}
-	return nil,false,nil
+	return memtable.Entry{},false,nil
 }
 
 // Delete removes a key-value pair from the database

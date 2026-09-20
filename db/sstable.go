@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -31,9 +32,9 @@ func Flush(mem *memtable.MemTable, sstable_incr int, path string) error {
 	sort.Strings(keys)
 
 	for _,key := range keys {
-		value := mem.Entries()[key]
+		entry := mem.Entries()[key]
 
-		_,err := file.Write([]byte(key + "|" + string(value) + "\n"))
+		_,err := file.Write([]byte(key + "|" + string(entry.Value) + "|" + strconv.FormatBool(entry.Tombstone) + "\n"))
 
 		if err != nil {
 			return err
@@ -44,12 +45,12 @@ func Flush(mem *memtable.MemTable, sstable_incr int, path string) error {
 }
 
 // Read data from segment files
-func Read(path string,key string) ([]byte,bool,error){
+func Read(path string,key string) (memtable.Entry,bool,error){
 
 	file,err := os.Open(path)
 
 	if err != nil {
-		return nil,false,err
+		return memtable.Entry{},false,err
 	}
 
 	defer file.Close()
@@ -61,17 +62,26 @@ func Read(path string,key string) ([]byte,bool,error){
 
 		parts := strings.Split(string(line),"|")
 
-		if len(parts) != 2 {
+		if len(parts) != 3 {
 			continue
 		}
+
 		if parts[0] == key{
+
+			if parts[2] == "true" {
+				return memtable.Entry{Tombstone: true}, true,nil
+			}
+			
 			fmt.Printf("Value %s",parts[1])
-			return []byte(parts[1]), true,nil
+			return memtable.Entry{
+				Value: []byte(parts[1]),
+				Tombstone: false,
+			}, true,nil
 		}
 	}
 
 	if err := scanner.Err(); err != nil {
-		return nil,false,err
+		return memtable.Entry{},false,err
 	}
-	return nil,false,nil
+	return memtable.Entry{},false,nil
 }
