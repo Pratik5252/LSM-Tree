@@ -1,8 +1,8 @@
 package record
 
 import (
-"strings"
-"errors"
+	"errors"
+	"strings"
 )
 
 type Operation string
@@ -18,7 +18,7 @@ type Record struct {
 	Value     []byte
 }
 
-// This parse the 
+// This parse the line 
 func ParseWal(line []byte) (*Record,error) {
 	parts := strings.Split(string(line),"|")
 

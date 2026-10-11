@@ -85,3 +85,40 @@ func Read(path string,key string) (memtable.Entry,bool,error){
 	}
 	return memtable.Entry{},false,nil
 }
+
+func ReadAll(path string) (map[string]memtable.Entry,error){
+	record := make(map[string]memtable.Entry)
+
+	file,err := os.Open(path)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer file.Close()
+	
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan(){
+		line := scanner.Bytes()
+
+		parts := strings.Split(string(line),"|")
+
+		if len(parts) != 3 {
+			continue
+		}
+
+		tombstone, err := strconv.ParseBool(parts[2])
+
+		if err != nil {
+			return nil, err
+		}
+		record[parts[0]] = memtable.Entry{
+			Value: []byte(parts[1]),
+			Tombstone: tombstone,
+		}
+		
+	}
+	return record,nil
+	
+}

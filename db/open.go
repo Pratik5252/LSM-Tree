@@ -73,5 +73,6 @@ func Open(path string) (*DB, error) {
 		memtable: memtable,
 		wal: wal,
 		nextSSTableID: currID,
+		path: path,
 	}, nil
 }
